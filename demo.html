@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PrivaTrace — session audit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-base:#10141a; --bg-panel:#161b23; --bg-raised:#1d232d;
+    --border:#2a3140; --border-soft:#232a35;
+    --text-primary:#e7e7e2; --text-muted:#8992a3; --text-faint:#5b6373;
+    --disclosed:#7fa1c4; --disclosed-dim:#3d4c5c;
+    --observed:#c9a227; --observed-dim:#4a4128;
+    --flag:#b5563f; --first-party:#5f9e78;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg-base);color:var(--text-primary);
+    font-family:'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+    font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;}
+  .app{max-width:1180px;margin:0 auto;padding:28px 20px 60px;}
+
+  .head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;
+    padding-bottom:18px;border-bottom:1px solid var(--border);}
+  .head h1{font-size:19px;font-weight:600;margin:0;letter-spacing:-0.01em;}
+  .head h1 .mark{color:var(--observed);}
+  .head .note{color:var(--text-faint);font-size:12px;}
+  .head .note .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--first-party);
+    margin-right:6px;position:relative;top:-1px;}
+
+  .tabs{display:flex;gap:2px;margin-top:20px;border-bottom:1px solid var(--border);}
+  .tab{padding:9px 16px;font-size:12.5px;color:var(--text-muted);cursor:pointer;
+    border:1px solid transparent;border-bottom:none;border-radius:6px 6px 0 0;
+    background:transparent;white-space:nowrap;transition:color .15s ease, background .15s ease;}
+  .tab:hover{color:var(--text-primary);}
+  .tab.active{background:var(--bg-panel);border-color:var(--border);color:var(--text-primary);position:relative;top:1px;}
+  .tab .cat{color:var(--text-faint);font-size:10.5px;display:block;margin-top:2px;}
+
+  .grid{display:grid;grid-template-columns:360px 1fr;gap:0;
+    border:1px solid var(--border);border-top:none;background:var(--bg-panel);}
+  @media (max-width:820px){.grid{grid-template-columns:1fr;}}
+  .col{padding:20px;}
+  .col-disclosed{border-right:1px solid var(--border);}
+  @media (max-width:820px){.col-disclosed{border-right:none;border-bottom:1px solid var(--border);}}
+
+  .col-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .col-head .sq{width:9px;height:9px;flex:none;}
+  .col-disclosed .sq{background:var(--disclosed);}
+  .col-observed .sq{background:var(--observed);}
+  .col-head h2{font-size:13px;font-weight:600;margin:0;}
+  .col-sub{color:var(--text-faint);font-size:11.5px;margin:0 0 16px 17px;}
+  .col-mode{color:var(--text-faint);font-size:10.5px;margin:0 0 16px 17px;
+    padding:2px 7px;border:1px solid var(--border-soft);border-radius:3px;display:inline-block;}
+
+  .platform{border:1px solid var(--border-soft);background:var(--bg-raised);padding:13px 14px;margin-bottom:10px;}
+  .platform.stale{border-color:#4a3a2e;}
+  .platform-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .platform-name{font-weight:500;font-size:13px;}
+  .platform-sync{color:var(--text-faint);font-size:10.5px;display:flex;align-items:center;gap:5px;}
+  .platform-sync .dot{width:5px;height:5px;border-radius:50%;background:var(--first-party);}
+  .platform-sync.not-connected .dot{background:var(--text-faint);}
+  .platform-sync.stale .dot{background:var(--observed);}
+  .platform-sync.syncing .dot{background:var(--disclosed);animation:pulse 1s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+  .chip{font-size:11px;padding:4px 9px;border:1px solid var(--border);border-radius:3px;
+    color:var(--text-muted);background:var(--bg-panel);}
+  .chip.dim{opacity:.55;}
+  .chip.flagged{border-color:var(--flag);border-style:dashed;color:#d0a08f;display:flex;align-items:center;gap:5px;}
+  .chip.flagged .q{width:12px;height:12px;border-radius:50%;border:1px solid var(--flag);
+    font-size:9px;display:flex;align-items:center;justify-content:center;color:var(--flag);}
+
+  .empty-state{color:var(--text-faint);font-size:11.5px;margin-bottom:10px;}
+  .btn{font-size:11.5px;padding:6px 11px;border:1px solid var(--border);border-radius:3px;
+    background:var(--bg-panel);color:var(--text-primary);cursor:pointer;font-family:inherit;}
+  .btn:hover{border-color:var(--disclosed);}
+  .btn:disabled{opacity:.5;cursor:default;}
+  .btn.primary{border-color:var(--disclosed);color:var(--disclosed);}
+  .platform-link{font-size:11px;color:var(--disclosed);cursor:pointer;text-decoration:none;
+    border-bottom:1px solid transparent;}
+  .platform-link:hover{border-bottom-color:var(--disclosed);}
+
+  .lanes{display:flex;gap:14px;margin-bottom:2px;}
+  .lane-count{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:5px;}
+  .lane-count .sq{width:6px;height:6px;}
+  .lane-count.storage .sq{background:var(--disclosed);}
+  .lane-count.network .sq{background:var(--observed);}
+  .lane-count.fingerprint .sq{background:var(--flag);}
+  .lane-count b{color:var(--text-primary);font-weight:600;}
+
+  .log{margin-top:12px;border-top:1px solid var(--border-soft);max-height:340px;overflow-y:auto;}
+  .log-row{display:grid;grid-template-columns:64px 90px 1fr auto;gap:10px;align-items:center;
+    padding:7px 2px;border-bottom:1px solid var(--border-soft);font-size:12px;animation:slideIn .25s ease-out;}
+  @keyframes slideIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
+  .log-time{color:var(--text-faint);font-size:10.5px;}
+  .log-type{font-size:10px;padding:2px 6px;border-radius:2px;text-align:center;white-space:nowrap;}
+  .log-type.storage{background:var(--disclosed-dim);color:var(--disclosed);}
+  .log-type.network{background:var(--observed-dim);color:var(--observed);}
+  .log-type.fingerprint{background:#3d2620;color:var(--flag);}
+  .log-detail{color:var(--text-primary);}
+  .log-detail .host{color:var(--text-muted);}
+  .log-flag{font-size:9.5px;padding:1px 6px;border-radius:2px;white-space:nowrap;}
+  .log-flag.tracker{background:#3d2620;color:var(--flag);border:1px solid #55352d;}
+  .log-flag.first-party{background:#1e3327;color:var(--first-party);border:1px solid #2b4636;}
+  .log-flag.unclassified{background:var(--observed-dim);color:var(--observed);border:1px solid #5a4c2f;}
+
+  .synthesis{border:1px solid var(--border);border-top:none;background:var(--bg-raised);
+    padding:16px 20px;font-size:12.5px;color:var(--text-muted);}
+  .synthesis b{color:var(--text-primary);font-weight:600;}
+  .synthesis .accent{color:var(--observed);}
+  .synthesis .caveat{display:block;margin-top:6px;color:var(--text-faint);font-size:11px;}
+
+  .toast{position:absolute;margin-top:6px;font-size:11px;color:var(--disclosed);}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="head">
+    <h1>Priva<span class="mark">Trace</span> — session audit</h1>
+    <div class="note"><span class="dot"></span>prototype · simulated data · nothing leaves this device</div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="grid">
+    <div class="col col-disclosed">
+      <div class="col-head"><span class="sq"></span><h2>Disclosed by platforms</h2></div>
+      <p class="col-sub">account-level, pulled from each platform's own settings</p>
+      <span class="col-mode">manual — you trigger each sync</span>
+      <div id="platforms"></div>
+    </div>
+
+    <div class="col col-observed">
+      <div class="col-head"><span class="sq"></span><h2>Observed on this page</h2></div>
+      <p class="col-sub">per-domain, live — resets when you switch tabs</p>
+      <span class="col-mode">automatic — runs on every page load</span>
+      <div class="lanes">
+        <div class="lane-count storage"><span class="sq"></span>storage <b id="cnt-storage">0</b></div>
+        <div class="lane-count network"><span class="sq"></span>network <b id="cnt-network">0</b></div>
+        <div class="lane-count fingerprint"><span class="sq"></span>fingerprint <b id="cnt-fingerprint">0</b></div>
+      </div>
+      <div class="log mono" id="log"></div>
+    </div>
+  </div>
+
+  <div class="synthesis" id="synthesis"></div>
+
+</div>
+
+<script>
+const DOMAINS = [
+  { id:'wander', host:'wander-outfitters.com', category:'Travel',
+    firstParty:['cdn.wander-outfitters.com','api.wander-outfitters.com'],
+    trackers:['doubleclick.net','connect.facebook.net','static.criteo.net'],
+    unclassified:['data.trkfusion.io'],
+    cookies:['_ga','_fbp','session_id','cart_id','ab_variant','IDE'],
+    storageKeys:['recently_viewed','user_prefs'] },
+  { id:'brew', host:'dailybrew-news.com', category:'News',
+    firstParty:['cdn.dailybrew-news.com','api.dailybrew-news.com'],
+    trackers:['doubleclick.net','scorecardresearch.com','connect.facebook.net'],
+    unclassified:['sync.adexchange.net'],
+    cookies:['_ga','__gads','ct_session','paywall_meter'],
+    storageKeys:['article_history','scroll_depth'] },
+  { id:'thrift', host:'thriftloop-shop.com', category:'Shopping',
+    firstParty:['cdn.thriftloop-shop.com','api.thriftloop-shop.com'],
+    trackers:['amazon-adsystem.com','static.criteo.net','doubleclick.net'],
+    unclassified:['pxl.retargetly.io'],
+    cookies:['_ga','cart_id','recently_bought','session_id'],
+    storageKeys:['wishlist','viewed_items'] },
+];
+
+// state: 'not_connected' | 'syncing' | 'synced' | 'stale'
+const PLATFORMS = [
+  { id:'google', name:'Google', settingsUrl:'https://myadcenter.google.com',
+    state:'synced', capturedAgo:'3h ago',
+    tags:['Travel','Hiking & camping','Coffee & tea','Fitness apps'],
+    flagged:'Baby products' },
+  { id:'meta', name:'Meta', settingsUrl:'https://accountscenter.facebook.com/ad_preferences',
+    state:'stale', capturedAgo:'19 days ago',
+    tags:['Outdoor recreation','Budget shopping','Wellness'] },
+  { id:'amazon', name:'Amazon', settingsUrl:'https://www.amazon.com/adprefs',
+    state:'not_connected', capturedAgo:null,
+    tags:[] },
+];
+
+const FP_APIS = [
+  'canvas.toDataURL() called','AudioContext.createOscillator()',
+  'navigator.plugins enumerated','WebGL renderer probed','font list enumerated',
+];
+
+let activeDomain = DOMAINS[0];
+let counts = { storage:0, network:0, fingerprint:0 };
+let timer = null;
+
+function renderTabs(){
+  const el = document.getElementById('tabs');
+  el.innerHTML = '';
+  DOMAINS.forEach(d => {
+    const tab = document.createElement('div');
+    tab.className = 'tab' + (d.id === activeDomain.id ? ' active' : '');
+    tab.innerHTML = `${d.host}<span class="cat">${d.category}</span>`;
+    tab.onclick = () => switchDomain(d);
+    el.appendChild(tab);
+  });
+}
+
+function syncStatusHtml(p){
+  if (p.state === 'not_connected') return `<span class="platform-sync not-connected"><span class="dot"></span>not yet connected</span>`;
+  if (p.state === 'syncing') return `<span class="platform-sync syncing"><span class="dot"></span>waiting for page…</span>`;
+  if (p.state === 'stale') return `<span class="platform-sync stale"><span class="dot"></span>stale — synced ${p.capturedAgo}</span>`;
+  return `<span class="platform-sync"><span class="dot"></span>synced ${p.capturedAgo}</span>`;
+}
+
+function renderPlatforms(){
+  const el = document.getElementById('platforms');
+  el.innerHTML = '';
+  PLATFORMS.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'platform' + (p.state === 'stale' ? ' stale' : '');
+    const dim = p.state === 'stale' ? ' dim' : '';
+    const chips = p.tags.map(t => `<span class="chip${dim}">${t}</span>`).join('');
+    const flagged = p.flagged ? `<span class="chip flagged${dim}"><span class="q">?</span>${p.flagged}</span>` : '';
+    const showEmpty = p.state === 'not_connected';
+    const btnLabel = p.state === 'not_connected' ? `Open ${p.name} ad settings`
+      : p.state === 'syncing' ? 'Opening…'
+      : `Re-sync ${p.name}`;
+    card.innerHTML = `
+      <div class="platform-head">
+        <span class="platform-name">${p.name}</span>
+        ${syncStatusHtml(p)}
+      </div>
+      ${showEmpty ? `<p class="empty-state">No data yet — open this platform's ad settings once and PrivaTrace will pick it up automatically while the page is open.</p>` : `<div class="chips">${chips}${flagged}</div>`}
+      <button class="btn${p.state === 'not_connected' ? ' primary' : ''}" ${p.state === 'syncing' ? 'disabled' : ''}
+        onclick="connectPlatform('${p.id}')">${btnLabel}</button>
+    `;
+    el.appendChild(card);
+  });
+}
+
+function connectPlatform(id){
+  const p = PLATFORMS.find(x => x.id === id);
+  if (!p || p.state === 'syncing') return;
+  window.open(p.settingsUrl, '_blank');
+  p.state = 'syncing';
+  renderPlatforms();
+  // simulates the content script's passive capture completing once that
+  // tab loads — in the real extension this is a chrome.runtime message,
+  // not a timer
+  setTimeout(() => {
+    p.state = 'synced';
+    p.capturedAgo = 'just now';
+    if (id === 'amazon' && p.tags.length === 0){
+      p.tags = ['Travel gear','Kitchen & home','Subscribe & Save'];
+    }
+    renderPlatforms();
+    updateSynthesis();
+  }, 2200);
+}
+
+function timeStr(){ return new Date().toTimeString().slice(0,8); }
+
+function addLogRow(type, detail, flag){
+  counts[type]++;
+  document.getElementById('cnt-' + type).textContent = counts[type];
+  const log = document.getElementById('log');
+  const row = document.createElement('div');
+  row.className = 'log-row';
+  const flagHtml = flag ? `<span class="log-flag ${flag.cls}">${flag.label}</span>` : '<span></span>';
+  row.innerHTML = `<span class="log-time">${timeStr()}</span>
+    <span class="log-type ${type}">${type}</span>
+    <span class="log-detail">${detail}</span>${flagHtml}`;
+  log.insertBefore(row, log.firstChild);
+  while (log.children.length > 40) log.removeChild(log.lastChild);
+  updateSynthesis();
+}
+
+function randOf(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function tick(){
+  const d = activeDomain;
+  const roll = Math.random();
+  if (roll < 0.4){
+    const isCookie = Math.random() < 0.6;
+    const key = isCookie ? randOf(d.cookies) : randOf(d.storageKeys);
+    addLogRow('storage', `${isCookie ? 'cookie set' : 'localStorage write'} <span class="host">${key}</span>`, null);
+  } else if (roll < 0.8){
+    const r2 = Math.random();
+    let host, flag;
+    if (r2 < 0.5){ host = randOf(d.trackers); flag = {cls:'tracker', label:'known tracker'}; }
+    else if (r2 < 0.85){ host = randOf(d.firstParty); flag = {cls:'first-party', label:'first-party'}; }
+    else { host = randOf(d.unclassified); flag = {cls:'unclassified', label:'unclassified'}; }
+    addLogRow('network', `fetch → <span class="host">${host}</span>`, flag);
+  } else {
+    addLogRow('fingerprint', randOf(FP_APIS), {cls:'tracker', label:'flagged'});
+  }
+}
+
+function updateSynthesis(){
+  const trackerHits = document.querySelectorAll('.log-flag.tracker').length;
+  const connected = PLATFORMS.filter(p => p.state === 'synced' || p.state === 'stale');
+  const overlap = connected.find(p => p.tags.some(t => t.toLowerCase().includes(activeDomain.category.toLowerCase())));
+  const el = document.getElementById('synthesis');
+  let overlapText = '';
+  if (overlap){
+    overlapText = ` Overlaps with <span class="accent">${overlap.name}</span>'s disclosed "${activeDomain.category}" interest.`;
+  } else if (connected.length === 0){
+    overlapText = ` No platforms connected yet, so no overlap check is possible.`;
+  }
+  el.innerHTML = `On <b>${activeDomain.host}</b>: <b>${counts.storage}</b> storage writes,
+    <b>${counts.network}</b> network requests (<b>${trackerHits}</b> to known trackers),
+    <b>${counts.fingerprint}</b> fingerprinting attempts.${overlapText}
+    <span class="caveat">This is a correlation between two separately-collected signals, not proof that one caused the other.</span>`;
+}
+
+function switchDomain(d){
+  activeDomain = d;
+  counts = { storage:0, network:0, fingerprint:0 };
+  document.getElementById('cnt-storage').textContent = 0;
+  document.getElementById('cnt-network').textContent = 0;
+  document.getElementById('cnt-fingerprint').textContent = 0;
+  document.getElementById('log').innerHTML = '';
+  renderTabs();
+  updateSynthesis();
+}
+
+renderTabs();
+renderPlatforms();
+switchDomain(DOMAINS[0]);
+clearInterval(timer);
+timer = setInterval(tick, 1500);
+</script>
+</body>
+</html>
