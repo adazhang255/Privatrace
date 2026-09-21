@@ -115,6 +115,82 @@
   .synthesis .caveat{display:block;margin-top:6px;color:var(--text-faint);font-size:11px;}
 
   .toast{position:absolute;margin-top:6px;font-size:11px;color:var(--disclosed);}
+
+  /* ---- view nav ---- */
+  .nav{display:flex;gap:4px;margin-top:18px;}
+  .nav button{font-family:inherit;font-size:12.5px;padding:7px 14px;cursor:pointer;
+    background:transparent;border:1px solid transparent;border-radius:4px;color:var(--text-muted);}
+  .nav button:hover{color:var(--text-primary);}
+  .nav button.active{background:var(--bg-raised);border-color:var(--border);color:var(--text-primary);}
+
+  /* ---- data / export view ---- */
+  .section{border:1px solid var(--border);background:var(--bg-panel);padding:20px;margin-top:16px;}
+  .section h2{font-size:13px;font-weight:600;margin:0 0 4px;display:flex;align-items:center;gap:8px;}
+  .section h2 .sq{width:9px;height:9px;flex:none;background:var(--observed);}
+  .section .col-sub{margin-left:17px;}
+
+  .export-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px;}
+  .export-note{color:var(--text-faint);font-size:11px;margin-top:10px;}
+
+  .infer{border:1px solid var(--border-soft);background:var(--bg-raised);padding:14px;margin-bottom:10px;}
+  .infer-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+  .infer-title{font-size:13px;font-weight:500;}
+  .infer-title .cat{color:var(--observed);}
+  .infer-conf{font-size:10.5px;padding:2px 7px;border-radius:3px;border:1px solid var(--border);
+    color:var(--text-muted);white-space:nowrap;}
+  .infer-conf.high{border-color:var(--first-party);color:var(--first-party);}
+  .infer-conf.medium{border-color:var(--observed);color:var(--observed);}
+  .infer-conf.low{border-color:var(--text-faint);color:var(--text-faint);}
+  .infer-because{font-size:12.5px;color:var(--text-muted);margin:9px 0 0;}
+  .infer-because b{color:var(--text-primary);font-weight:500;}
+  .infer-ev{margin:10px 0 0;padding:0;list-style:none;border-top:1px solid var(--border-soft);}
+  .infer-ev li{display:grid;grid-template-columns:96px 1fr;gap:10px;padding:6px 0;
+    border-bottom:1px solid var(--border-soft);font-size:11.5px;color:var(--text-muted);}
+  .infer-ev li:last-child{border-bottom:none;}
+  .infer-ev .d{color:var(--text-faint);}
+  .infer-ev .h{color:var(--text-primary);}
+  .infer-toggle{font-size:11px;color:var(--disclosed);cursor:pointer;background:none;border:none;
+    padding:8px 0 0;font-family:inherit;}
+  .infer-toggle:hover{text-decoration:underline;}
+  .infer-match{border-color:var(--disclosed);}
+  .infer-badge{font-size:10px;padding:2px 7px;border-radius:3px;white-space:nowrap;
+    background:var(--disclosed-dim);color:var(--disclosed);}
+
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:12px;margin-top:12px;}
+  .kv dt{color:var(--text-faint);}
+  .kv dd{margin:0;color:var(--text-primary);}
+
+  /* ---- retention / deletion ---- */
+  .section.retention{border-color:var(--first-party);}
+  .section.retention h2 .sq{background:var(--first-party);}
+  .ephemeral{display:flex;align-items:flex-start;gap:9px;background:#18271e;border:1px solid #2b4636;
+    padding:11px 13px;margin-top:14px;font-size:12px;color:#a8c9b4;}
+  .ephemeral .sq{width:8px;height:8px;flex:none;background:var(--first-party);margin-top:5px;}
+  .ephemeral b{color:#cfe6d8;font-weight:500;}
+
+  .retain-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:16px;font-size:12px;
+    color:var(--text-muted);}
+  .retain-opts{display:flex;gap:2px;}
+  .retain-opts button{font-family:inherit;font-size:11.5px;padding:5px 11px;cursor:pointer;
+    background:var(--bg-panel);border:1px solid var(--border);color:var(--text-muted);}
+  .retain-opts button.active{border-color:var(--first-party);color:var(--first-party);background:#18271e;}
+
+  .held{margin-top:16px;border-top:1px solid var(--border-soft);}
+  .held-row{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;
+    padding:9px 2px;border-bottom:1px solid var(--border-soft);font-size:12px;}
+  .held-row .name{color:var(--text-primary);}
+  .held-row .meta{color:var(--text-faint);font-size:11px;}
+  .btn-del{font-family:inherit;font-size:11px;padding:4px 9px;cursor:pointer;background:transparent;
+    border:1px solid var(--border);border-radius:3px;color:var(--text-muted);white-space:nowrap;}
+  .btn-del:hover{border-color:var(--flag);color:#d0a08f;}
+  .btn-danger{border-color:var(--flag);color:#d0a08f;}
+  .btn-danger:hover{background:#3d2620;}
+
+  .expired{color:var(--text-faint);font-size:11px;margin-top:12px;font-style:italic;}
+  .infer-ev li .row-del{cursor:pointer;color:var(--text-faint);background:none;border:none;
+    font-family:inherit;font-size:11px;padding:0 0 0 8px;}
+  .infer-ev li .row-del:hover{color:#d0a08f;}
+  .infer-ev li{grid-template-columns:96px 1fr auto;}
 </style>
 </head>
 <body>
@@ -124,6 +200,13 @@
     <h1>Priva<span class="mark">Trace</span> — session audit</h1>
     <div class="note"><span class="dot"></span>prototype · simulated data · nothing leaves this device</div>
   </div>
+
+  <div class="nav">
+    <button id="nav-audit" class="active" onclick="switchView('audit')">Session audit</button>
+    <button id="nav-data" onclick="switchView('data')">Your data &amp; profile</button>
+  </div>
+
+<div id="view-audit">
 
   <div class="tabs" id="tabs"></div>
 
@@ -149,6 +232,74 @@
   </div>
 
   <div class="synthesis" id="synthesis"></div>
+
+</div><!-- /view-audit -->
+
+<div id="view-data" hidden>
+
+  <div class="section retention">
+    <h2><span class="sq"></span>What's being held right now</h2>
+    <p class="col-sub">all of it temporary, all of it deletable — nothing here survives closing the tab</p>
+
+    <div class="ephemeral">
+      <span class="sq"></span>
+      <span>
+        <b>Held in memory only.</b> Your activity is never written to disk, never synced, and never
+        sent anywhere. Close this tab and it is gone — there is no stored copy to come back to.
+        Entries also age out automatically, and you can delete any of it at any time.
+      </span>
+    </div>
+
+    <div class="retain-row">
+      <span>Discard activity older than</span>
+      <span class="retain-opts" id="retain-opts"></span>
+    </div>
+
+    <div class="held" id="held"></div>
+    <p class="expired" id="expired-note" hidden></p>
+
+    <div class="export-row">
+      <button class="btn-del btn-danger" onclick="deleteAllActivity()">Delete all activity</button>
+      <button class="btn-del btn-danger" onclick="deleteEverything()">Delete everything, including synced profiles</button>
+      <span class="toast" id="delete-toast" hidden></span>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2><span class="sq"></span>Why PrivaTrace thinks you'd see these ads</h2>
+    <p class="col-sub">inferred locally from your own activity — each line shows the evidence it was built from</p>
+    <div id="inferred"></div>
+    <p class="export-note">
+      This is PrivaTrace's own guess, computed on this device from the pages in your activity log.
+      It is not what any ad platform actually thinks — compare it against the disclosed panel on the
+      audit view to see where they agree and where they don't.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2><span class="sq"></span>Download your data</h2>
+    <p class="col-sub">everything PrivaTrace holds about you, in one file — the same idea as Instagram's export</p>
+    <dl class="kv" id="export-summary"></dl>
+    <div class="export-row">
+      <button class="btn primary" onclick="downloadExport('json')">Download JSON</button>
+      <button class="btn" onclick="downloadExport('html')">Download readable report</button>
+      <button class="btn" onclick="downloadExport('csv')">Download activity CSV</button>
+      <span class="toast" id="export-toast" hidden></span>
+    </div>
+    <p class="export-note">
+      The export is assembled in your browser and saved straight to your downloads folder — it is
+      never uploaded anywhere. The JSON file is the complete record; the readable report is the same
+      data formatted for a human; the CSV is just the activity log for spreadsheets.
+    </p>
+    <p class="export-note">
+      Because PrivaTrace keeps nothing after the tab closes, <b>an export is the only way to make
+      any of this durable</b> — and then it's an ordinary file you own, in your downloads folder,
+      that you can delete like any other. That's the intended asymmetry: persisting your data
+      should take a deliberate action, while forgetting it should be the default.
+    </p>
+  </div>
+
+</div><!-- /view-data -->
 
 </div>
 
@@ -196,6 +347,436 @@ const FP_APIS = [
 let activeDomain = DOMAINS[0];
 let counts = { storage:0, network:0, fingerprint:0 };
 let timer = null;
+
+// ---------------------------------------------------------------------------
+// Activity log — the raw material every inference below is built from.
+//
+// EPHEMERAL BY DESIGN. This is a plain in-memory array and that is the entire
+// storage layer: no localStorage, no IndexedDB, no chrome.storage, nothing that
+// outlives the tab. A browsing history is more revealing than the ad profiles
+// this tool exists to critique, so the tool refuses to be the thing that
+// accumulates one. Three mechanisms enforce that:
+//
+//   1. no persistence   — closing the tab destroys it, with no recovery path
+//   2. auto-expiry      — entries past the retention window are dropped, not archived
+//   3. granular delete  — per entry, per topic, or all of it, at any time
+//
+// The seed rows below exist only so the profile page isn't blank on first open,
+// and they are subject to all three rules exactly like real entries.
+// ---------------------------------------------------------------------------
+const DAY = 86400000;
+
+let RETENTION_DAYS = 14;
+const RETENTION_CHOICES = [3, 7, 14, 30];
+
+let expiredCount = 0;   // how many rows have aged out since this session began
+let uidSeq = 0;
+function uid(){ return 'a' + (++uidSeq); }
+
+function daysAgo(n, hour){
+  const d = new Date(Date.now() - n * DAY);
+  d.setHours(hour, Math.floor(Math.random()*60), 0, 0);
+  return d.getTime();
+}
+
+let ACTIVITY = [
+  { ts:daysAgo(23, 20), host:'wheelsandtorque.com',     topic:'cars',    detail:'read "2024 hybrid SUV comparison"' },
+  { ts:daysAgo(18, 22), host:'wander-outfitters.com',   topic:'travel',  detail:'viewed 4 hiking packs' },
+  { ts:daysAgo(13,  9), host:'autotrader-style.com',    topic:'cars',    detail:'searched "used estate car under 15k"' },
+  { ts:daysAgo(12, 19), host:'wheelsandtorque.com',     topic:'cars',    detail:'read "EV charging costs explained"' },
+  { ts:daysAgo(11, 11), host:'dailybrew-news.com',      topic:'news',    detail:'read 6 articles' },
+  { ts:daysAgo(9,  21), host:'thriftloop-shop.com',     topic:'shopping',detail:'added 2 items to wishlist' },
+  { ts:daysAgo(8,  13), host:'trailhead-guides.com',    topic:'travel',  detail:'read "3-day coastal routes"' },
+  { ts:daysAgo(7,  16), host:'wander-outfitters.com',   topic:'travel',  detail:'compared 2 tents' },
+  { ts:daysAgo(5,  18), host:'fitpulse-tracker.com',    topic:'fitness', detail:'browsed running watches' },
+  { ts:daysAgo(4,  20), host:'wheelsandtorque.com',     topic:'cars',    detail:'viewed dealer listings' },
+  { ts:daysAgo(2,  12), host:'thriftloop-shop.com',     topic:'shopping',detail:'viewed 9 items' },
+  { ts:daysAgo(1,  10), host:'dailybrew-news.com',      topic:'news',    detail:'read 3 articles' },
+].map(a => ({ id:uid(), ...a }));
+
+// ---------------------------------------------------------------------------
+// Retention and deletion.
+//
+// Expiry drops rows outright rather than aggregating them into a summary
+// first. A "you were interested in cars last month" rollup would be smaller
+// than the rows that produced it but no less sensitive, and it would quietly
+// outlive the deletion the user asked for — so there is no rollup. When a row
+// goes, everything derived from it goes with it, because every derived number
+// on this page is recomputed from ACTIVITY on each render and nothing is cached.
+// ---------------------------------------------------------------------------
+function pruneActivity(){
+  const cutoff = Date.now() - RETENTION_DAYS * DAY;
+  const before = ACTIVITY.length;
+  ACTIVITY = ACTIVITY.filter(a => a.ts >= cutoff);
+  const dropped = before - ACTIVITY.length;
+  expiredCount += dropped;
+  return dropped;
+}
+
+function deleteEntry(id){
+  ACTIVITY = ACTIVITY.filter(a => a.id !== id);
+  refreshDataView('Entry deleted');
+}
+
+function deleteTopic(topic){
+  const n = ACTIVITY.filter(a => a.topic === topic).length;
+  ACTIVITY = ACTIVITY.filter(a => a.topic !== topic);
+  refreshDataView(`Deleted ${n} ${TOPICS[topic]?.label || topic} ${n === 1 ? 'entry' : 'entries'}`);
+}
+
+function deleteAllActivity(){
+  const n = ACTIVITY.length;
+  ACTIVITY = [];
+  expiredCount = 0;
+  refreshDataView(`Deleted all ${n} activity ${n === 1 ? 'entry' : 'entries'}`);
+}
+
+function deleteEverything(){
+  const n = ACTIVITY.length;
+  ACTIVITY = [];
+  expiredCount = 0;
+  // also drop the captured platform profiles, returning them to "not connected"
+  PLATFORMS.forEach(p => {
+    p.tags = [];
+    p.flagged = null;
+    p.state = 'not_connected';
+    p.capturedAgo = null;
+  });
+  counts = { storage:0, network:0, fingerprint:0 };
+  renderPlatforms();
+  refreshDataView(`Deleted ${n} activity entries and all synced platform profiles`);
+}
+
+function setRetention(days){
+  RETENTION_DAYS = days;
+  refreshDataView(null);
+}
+
+function refreshDataView(message){
+  renderInferred();
+  if (message){
+    const toast = document.getElementById('delete-toast');
+    toast.textContent = message;
+    toast.hidden = false;
+    setTimeout(() => { toast.hidden = true; }, 4000);
+  }
+}
+
+// topic -> the ad category a platform would plausibly derive from it
+const TOPICS = {
+  cars:     { label:'Cars & automotive',   phrase:'cars' },
+  travel:   { label:'Travel & outdoors',   phrase:'travel and outdoor gear' },
+  shopping: { label:'Secondhand shopping', phrase:'thrift and resale shopping' },
+  fitness:  { label:'Fitness equipment',   phrase:'fitness gear' },
+  news:     { label:'News & current affairs', phrase:'news subscriptions' },
+};
+
+function fmtDate(ts){
+  return new Date(ts).toLocaleDateString(undefined, { month:'short', day:'numeric' });
+}
+
+function fmtDateTime(ts){
+  return new Date(ts).toLocaleString(undefined,
+    { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+// ---------------------------------------------------------------------------
+// The inference itself.
+//
+// Deliberately simple and fully explainable: score a topic by how many distinct
+// days it appears on and how recent those days are, then hand back the exact
+// rows that produced the score. Anything that can't point at its own evidence
+// doesn't get shown — that's the whole premise of the page.
+// ---------------------------------------------------------------------------
+function inferProfile(){
+  pruneActivity();   // expired rows must never reach a conclusion
+  const byTopic = {};
+  ACTIVITY.forEach(a => { (byTopic[a.topic] ||= []).push(a); });
+
+  return Object.entries(byTopic).map(([topic, rows]) => {
+    rows.sort((a,b) => b.ts - a.ts);
+    const days = new Set(rows.map(r => new Date(r.ts).toDateString()));
+    const daysSinceLast = Math.floor((Date.now() - rows[0].ts) / DAY);
+
+    // recency multiplier: something you did yesterday counts more than
+    // something you did a month ago, but old activity never drops to zero
+    const recency = daysSinceLast <= 7 ? 1 : daysSinceLast <= 21 ? 0.6 : 0.3;
+    const score = (days.size * 2 + rows.length) * recency;
+
+    const confidence = days.size >= 3 && daysSinceLast <= 21 ? 'high'
+      : days.size >= 2 ? 'medium' : 'low';
+
+    return {
+      topic,
+      label: TOPICS[topic]?.label || topic,
+      phrase: TOPICS[topic]?.phrase || topic,
+      rows, score, confidence,
+      distinctDays: days.size,
+      daysSinceLast,
+    };
+  }).sort((a,b) => b.score - a.score);
+}
+
+// Does any connected platform already disclose this topic? Used to show where
+// PrivaTrace's guess and the platform's own stated profile line up.
+function disclosedMatch(inf){
+  const needle = inf.label.split(' ')[0].toLowerCase();
+  for (const p of PLATFORMS){
+    if (p.state === 'not_connected') continue;
+    const hit = p.tags.find(t => t.toLowerCase().includes(needle)
+      || needle.includes(t.toLowerCase().split(' ')[0]));
+    if (hit) return { platform:p.name, tag:hit };
+  }
+  return null;
+}
+
+function becauseSentence(inf){
+  // the two most recent evidence dates, which is what makes the claim checkable
+  const dates = [...new Set(inf.rows.map(r => fmtDate(r.ts)))].slice(0, 2);
+  const when = dates.length > 1 ? `on ${dates[1]} and ${dates[0]}` : `on ${dates[0]}`;
+  const host = inf.rows[0].host;
+  return `You would likely be shown ads about <b>${inf.phrase}</b>, because ${when} you looked at ${inf.topic} content on <b>${host}</b>.`;
+}
+
+// Shows exactly what is held, grouped by topic, each group independently
+// deletable. Grouping is the point: there is no single "your history" blob to
+// delete all-or-nothing, so forgetting one interest doesn't cost you the rest.
+function renderRetention(){
+  const optsEl = document.getElementById('retain-opts');
+  if (!optsEl) return;
+  optsEl.innerHTML = RETENTION_CHOICES.map(d =>
+    `<button class="${d === RETENTION_DAYS ? 'active' : ''}" onclick="setRetention(${d})">${d} days</button>`
+  ).join('');
+
+  const heldEl = document.getElementById('held');
+  const byTopic = {};
+  ACTIVITY.forEach(a => { (byTopic[a.topic] ||= []).push(a); });
+  const topics = Object.entries(byTopic).sort((a,b) => b[1].length - a[1].length);
+
+  if (!topics.length){
+    heldEl.innerHTML = `<p class="empty-state" style="padding-top:12px">Nothing held. No activity, nothing derived from any.</p>`;
+  } else {
+    heldEl.innerHTML = topics.map(([topic, rows]) => {
+      const newest = Math.max(...rows.map(r => r.ts));
+      const oldest = Math.min(...rows.map(r => r.ts));
+      const expires = Math.ceil((oldest + RETENTION_DAYS * DAY - Date.now()) / DAY);
+      return `<div class="held-row">
+        <span class="name">${TOPICS[topic]?.label || topic}</span>
+        <span class="meta">${rows.length} ${rows.length === 1 ? 'entry' : 'entries'} ·
+          ${fmtDate(oldest)}–${fmtDate(newest)} ·
+          oldest expires in ${expires} ${expires === 1 ? 'day' : 'days'}</span>
+        <button class="btn-del" onclick="deleteTopic('${topic}')">Forget this</button>
+      </div>`;
+    }).join('');
+  }
+
+  const note = document.getElementById('expired-note');
+  if (expiredCount > 0){
+    note.textContent = `${expiredCount} ${expiredCount === 1 ? 'entry has' : 'entries have'} `
+      + `passed the ${RETENTION_DAYS}-day window this session and been discarded. `
+      + `They were deleted, not summarised — nothing derived from them remains.`;
+    note.hidden = false;
+  } else {
+    note.hidden = true;
+  }
+}
+
+function renderInferred(){
+  const el = document.getElementById('inferred');
+  const profile = inferProfile();
+  renderRetention();
+  renderExportSummary();
+  el.innerHTML = '';
+
+  if (!profile.length){
+    el.innerHTML = `<p class="empty-state">Nothing inferred — there is no activity to infer from. Browse a few of the simulated tabs on the audit view and this page will fill in.</p>`;
+    return;
+  }
+
+  profile.forEach((inf, i) => {
+    const match = disclosedMatch(inf);
+    const card = document.createElement('div');
+    card.className = 'infer' + (match ? ' infer-match' : '');
+    const evidence = inf.rows.map(r => `
+      <li><span class="d">${fmtDate(r.ts)}</span>
+        <span><span class="h">${r.host}</span> — ${r.detail}</span>
+        <button class="row-del" title="Delete this entry" onclick="deleteEntry('${r.id}')">delete ✕</button></li>
+    `).join('');
+    card.innerHTML = `
+      <div class="infer-head">
+        <span class="infer-title"><span class="cat">${inf.label}</span></span>
+        <span>
+          ${match ? `<span class="infer-badge">${match.platform} also lists "${match.tag}"</span>` : ''}
+          <span class="infer-conf ${inf.confidence}">${inf.confidence} confidence</span>
+        </span>
+      </div>
+      <p class="infer-because">${becauseSentence(inf)}</p>
+      <button class="infer-toggle" onclick="toggleEvidence(${i})">
+        Show all ${inf.rows.length} evidence ${inf.rows.length === 1 ? 'entry' : 'entries'} ▾
+      </button>
+      <ul class="infer-ev" id="ev-${i}" hidden>${evidence}</ul>
+    `;
+    el.appendChild(card);
+  });
+}
+
+function toggleEvidence(i){
+  const ul = document.getElementById('ev-' + i);
+  const btn = ul.previousElementSibling;
+  ul.hidden = !ul.hidden;
+  btn.textContent = (ul.hidden ? 'Show all ' : 'Hide ') + ul.children.length
+    + ` evidence ${ul.children.length === 1 ? 'entry' : 'entries'} ` + (ul.hidden ? '▾' : '▴');
+}
+
+// ---------------------------------------------------------------------------
+// Export — assembled in-page and saved via a blob URL, so nothing is uploaded.
+// ---------------------------------------------------------------------------
+function buildExport(){
+  return {
+    exportedAt: new Date().toISOString(),
+    generatedBy: 'PrivaTrace prototype',
+    note: 'All data in this file was assembled locally in your browser. Nothing was uploaded. '
+      + 'PrivaTrace holds this data in memory only and discards it when the tab closes, so this '
+      + 'file is the only durable copy — it exists because you asked for it, and keeping or '
+      + 'deleting it is now entirely your call.',
+    retentionDays: RETENTION_DAYS,
+    disclosedByPlatforms: PLATFORMS.map(p => ({
+      platform: p.id,
+      name: p.name,
+      syncState: p.state,
+      lastSynced: p.capturedAgo,
+      interests: p.tags,
+      flaggedAsUnexpected: p.flagged || null,
+    })),
+    activityLog: ACTIVITY.slice().sort((a,b) => b.ts - a.ts).map(a => ({
+      timestamp: new Date(a.ts).toISOString(),
+      host: a.host,
+      topic: a.topic,
+      detail: a.detail,
+    })),
+    inferredAdProfile: inferProfile().map(inf => ({
+      category: inf.label,
+      confidence: inf.confidence,
+      score: Math.round(inf.score * 10) / 10,
+      distinctDaysOfActivity: inf.distinctDays,
+      daysSinceMostRecent: inf.daysSinceLast,
+      explanation: becauseSentence(inf).replace(/<\/?b>/g, ''),
+      alsoDisclosedBy: disclosedMatch(inf)?.platform || null,
+      evidence: inf.rows.map(r => ({
+        date: new Date(r.ts).toISOString(),
+        host: r.host,
+        detail: r.detail,
+      })),
+    })),
+    currentSessionObservations: {
+      domain: activeDomain.host,
+      storageWrites: counts.storage,
+      networkRequests: counts.network,
+      fingerprintAttempts: counts.fingerprint,
+    },
+  };
+}
+
+function esc(s){
+  return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+function exportToHtml(data){
+  const section = (title, body) => `<h2>${title}</h2>${body}`;
+  const platforms = data.disclosedByPlatforms.map(p => `
+    <h3>${esc(p.name)}</h3>
+    <p>Sync state: ${esc(p.syncState)}${p.lastSynced ? ` (last synced ${esc(p.lastSynced)})` : ''}</p>
+    <p>Interests: ${p.interests.length ? p.interests.map(esc).join(', ') : '<em>none captured</em>'}</p>
+    ${p.flaggedAsUnexpected ? `<p>Flagged as unexpected: ${esc(p.flaggedAsUnexpected)}</p>` : ''}
+  `).join('');
+  const inferred = data.inferredAdProfile.map(i => `
+    <h3>${esc(i.category)} <small>(${esc(i.confidence)} confidence)</small></h3>
+    <p>${esc(i.explanation)}</p>
+    <ul>${i.evidence.map(e =>
+      `<li>${esc(new Date(e.date).toLocaleDateString())} — ${esc(e.host)}: ${esc(e.detail)}</li>`
+    ).join('')}</ul>
+  `).join('');
+  const activity = data.activityLog.map(a =>
+    `<tr><td>${esc(new Date(a.timestamp).toLocaleString())}</td><td>${esc(a.host)}</td><td>${esc(a.detail)}</td></tr>`
+  ).join('');
+
+  return `<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Your PrivaTrace data</title>
+<style>body{font-family:system-ui,sans-serif;max-width:760px;margin:40px auto;padding:0 20px;line-height:1.55;color:#222}
+h1{border-bottom:2px solid #333;padding-bottom:8px}h2{margin-top:36px;border-bottom:1px solid #ccc;padding-bottom:4px}
+h3{margin-bottom:4px}table{border-collapse:collapse;width:100%;font-size:14px}
+td,th{border-bottom:1px solid #ddd;padding:6px 8px;text-align:left}
+.note{background:#f4f4f0;padding:12px 16px;border-left:3px solid #999;font-size:14px}</style>
+</head><body>
+<h1>Your PrivaTrace data</h1>
+<p class="note">${esc(data.note)}<br>Exported ${esc(new Date(data.exportedAt).toLocaleString())}.</p>
+${section('Disclosed by platforms', platforms)}
+${section("PrivaTrace's own inferred ad profile", inferred)}
+${section('Activity log', `<table><tr><th>When</th><th>Site</th><th>What</th></tr>${activity}</table>`)}
+</body></html>`;
+}
+
+function exportToCsv(data){
+  const rows = [['timestamp','host','topic','detail']];
+  data.activityLog.forEach(a => rows.push([a.timestamp, a.host, a.topic, a.detail]));
+  return rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+}
+
+function downloadExport(format){
+  const data = buildExport();
+  const stamp = new Date().toISOString().slice(0,10);
+  let blob, filename;
+
+  if (format === 'json'){
+    blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+    filename = `privatrace-export-${stamp}.json`;
+  } else if (format === 'csv'){
+    blob = new Blob([exportToCsv(data)], { type:'text/csv' });
+    filename = `privatrace-activity-${stamp}.csv`;
+  } else {
+    blob = new Blob([exportToHtml(data)], { type:'text/html' });
+    filename = `privatrace-report-${stamp}.html`;
+  }
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  const toast = document.getElementById('export-toast');
+  toast.textContent = `Saved ${filename}`;
+  toast.hidden = false;
+  setTimeout(() => { toast.hidden = true; }, 4000);
+}
+
+function renderExportSummary(){
+  const el = document.getElementById('export-summary');
+  if (!el) return;
+  const connected = PLATFORMS.filter(p => p.state !== 'not_connected');
+  const covering = ACTIVITY.length
+    ? `${fmtDate(Math.min(...ACTIVITY.map(a => a.ts)))} — today`
+    : 'nothing held';
+  el.innerHTML = `
+    <dt>Activity entries</dt><dd>${ACTIVITY.length}</dd>
+    <dt>Covering</dt><dd>${covering}</dd>
+    <dt>Retention window</dt><dd>${RETENTION_DAYS} days</dd>
+    <dt>Platforms connected</dt><dd>${connected.length} of ${PLATFORMS.length}${connected.length ? ` (${connected.map(p=>p.name).join(', ')})` : ''}</dd>
+    <dt>Disclosed interests held</dt><dd>${PLATFORMS.reduce((n,p) => n + p.tags.length, 0)}</dd>
+    <dt>Inferred ad categories</dt><dd>${inferProfile().length}</dd>
+  `;
+}
+
+function switchView(view){
+  document.getElementById('view-audit').hidden = view !== 'audit';
+  document.getElementById('view-data').hidden = view !== 'data';
+  document.getElementById('nav-audit').classList.toggle('active', view === 'audit');
+  document.getElementById('nav-data').classList.toggle('active', view === 'data');
+  if (view === 'data') renderInferred();
+}
 
 function renderTabs(){
   const el = document.getElementById('tabs');
@@ -259,6 +840,7 @@ function connectPlatform(id){
     }
     renderPlatforms();
     updateSynthesis();
+    renderInferred();
   }, 2200);
 }
 
@@ -317,8 +899,25 @@ function updateSynthesis(){
     <span class="caveat">This is a correlation between two separately-collected signals, not proof that one caused the other.</span>`;
 }
 
+// Visiting a tab is itself activity — record it so the profile page reflects
+// what you actually did in this session, not just the seeded history.
+function recordVisit(d){
+  const topic = d.category.toLowerCase();
+  const last = ACTIVITY.filter(a => a.host === d.host).sort((a,b) => b.ts - a.ts)[0];
+  if (last && Date.now() - last.ts < 60000) return; // don't log tab-flipping
+  ACTIVITY.push({
+    id: uid(),
+    ts: Date.now(),
+    host: d.host,
+    topic: TOPICS[topic] ? topic : 'shopping',
+    detail: `visited during this session (${d.category.toLowerCase()} page)`,
+  });
+  if (!document.getElementById('view-data').hidden) renderInferred();
+}
+
 function switchDomain(d){
   activeDomain = d;
+  recordVisit(d);
   counts = { storage:0, network:0, fingerprint:0 };
   document.getElementById('cnt-storage').textContent = 0;
   document.getElementById('cnt-network').textContent = 0;
@@ -330,6 +929,7 @@ function switchDomain(d){
 
 renderTabs();
 renderPlatforms();
+renderInferred();
 switchDomain(DOMAINS[0]);
 clearInterval(timer);
 timer = setInterval(tick, 1500);

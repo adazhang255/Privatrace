@@ -230,3 +230,88 @@ Staleness is a nudge to re-sync, not a reason to hide data you already have — 
 ## 9. Standing risk to flag before shipping beyond personal use
 
 Reading your own account settings page with a content script is different, legally, from an unattended scraper — but most platforms' terms of service use broad "automated access" language that doesn't cleanly distinguish the two. This design (user-initiated tab open, no scheduling, no headless requests) is the lower-risk end of the spectrum, but it isn't a legal opinion. Worth a real ToS read, or legal review, before distributing this to anyone beyond yourself.
+
+---
+
+## 10. Activity log and the inference engine
+
+The disclosed panel answers "what does Google think about me". It cannot answer "why", because the platform doesn't say. The inference engine exists to make that second question answerable at all — by building a parallel profile from data the user *can* inspect, and requiring every claim in it to carry its own evidence.
+
+### 10.1 Activity schema
+
+```ts
+interface ActivityEntry {
+  id: string;        // local, for targeted deletion
+  ts: number;        // epoch ms — when it happened
+  host: string;      // the site
+  topic: string;     // key into the TOPICS table
+  detail: string;    // human-readable: 'read "EV charging costs explained"'
+}
+```
+
+`detail` is deliberately a display string rather than structured fields. It only ever gets shown to the user or written to their export; nothing computes on it. Keeping it unstructured means a new activity source can write whatever is most legible for its own kind of event without a schema change.
+
+In the prototype these entries are synthetic, plus one appended per simulated tab visit. In a real build the producer is a `tabs.onUpdated` listener classifying visited hosts against a local topic table — never a remote lookup, since sending the user's browsing history to a classification service would defeat the entire premise.
+
+### 10.2 The activity log is ephemeral, and that is load-bearing
+
+A browsing history is more revealing than the ad profiles this tool exists to critique. A privacy tool that accumulates one — even locally, even with good intentions — has become the thing it is arguing against. So the storage layer is deliberately the weakest one available:
+
+| Mechanism | Prototype | Real extension |
+|---|---|---|
+| Persistence | none — a plain in-memory array | `chrome.storage.session`, never `local`, never `sync` |
+| Expiry | rows past the retention window are dropped on every inference | same |
+| Deletion | per entry, per topic, or all; plus a reset of captured platform profiles | same |
+| Derived data | recomputed on every render, never cached | same |
+
+Four properties follow, each of which is a constraint on future changes rather than an implementation detail:
+
+**No persistence, and no recovery path.** Closing the tab destroys the log. A recovery path would be a stored copy, so there deliberately isn't one. In the extension, `chrome.storage.session` gives exactly the right semantics — it survives the service-worker restarts described in §2 but not browser close. MV3's non-persistent worker, normally an obstacle, is aligned with this design.
+
+**Expiry deletes rather than summarises.** This is the non-obvious one. A retention rollup — "was interested in cars last month" — would be smaller than the rows behind it but no less sensitive, and it would quietly outlive the deletion the user asked for. There is therefore no rollup anywhere in the pipeline. A consequence worth preserving: narrowing the retention window destroys rows irreversibly, and widening it back does not restore them. Destructive and irreversible is correct for a delete control.
+
+**Deletion is partitioned by topic, not all-or-nothing.** There is no single "your history" blob. Forgetting one interest doesn't cost the others, so the user is never forced to choose between granularity and privacy.
+
+**Nothing derived is cached.** Scores, confidences, summary sentences and the export are all recomputed from `ACTIVITY` on each render. This is what makes deletion actually mean deletion — a cached score would leave a conclusion standing after its evidence was destroyed, which is precisely the failure mode this product exists to criticise. It is the same invariant as §10.5, viewed from the other side.
+
+The tradeoff is real and should not be papered over: a longer window would produce better inferences and catch slow-building interests that 14 days misses. The judgement is that a tool making its point from two weeks of data makes the argument more effectively than one that needs a year of history to do it, and the user-selectable window lets anyone who disagrees choose otherwise while the default protects whoever never opens settings.
+
+### 10.3 Export as the only durable copy
+
+Because nothing persists, an export is the sole route to durable data — which makes it a deliberate user action producing an ordinary file they own and can delete like any other. The asymmetry is the design: persisting takes an explicit act, forgetting is the default. That is the inverse of every platform whose profiles this tool displays, and it is the clearest available demonstration of the alternative.
+
+### 10.4 Scoring
+
+```
+score = (distinctDays × 2 + totalVisits) × recency
+
+recency = daysSinceLast ≤ 7  → 1.0
+          daysSinceLast ≤ 21 → 0.6
+          otherwise          → 0.3
+```
+
+Distinct days are weighted double because they discriminate better than raw volume: eight page views in one evening is a single burst of curiosity, while three visits across three days is sustained intent. Raw visit count still contributes, but as the weaker term.
+
+Recency decays in steps rather than continuously, and floors at 0.3 instead of zero. A step function is chosen over exponential decay purely so the user can reproduce the number by hand — a score nobody can recompute is as opaque as the platform profile this is meant to critique. The floor exists because stale interest is weak evidence, not absence of evidence.
+
+Confidence is a separate categorical rule (`high`: 3+ distinct days and recent; `medium`: 2+ days; `low`: otherwise) rather than a threshold on `score`, so that a high score driven by one frenzied afternoon still reports as low confidence. Volume and reliability are different claims and the UI shows them separately.
+
+### 10.5 The evidence invariant
+
+`inferProfile()` returns the contributing `ActivityEntry` rows on every result object, and the renderer builds both the summary sentence and the expandable list from that same array. There is no path that emits a conclusion without its sources, because the conclusion and the sources are the same object.
+
+This is the one property worth protecting during any future change to this file. If scoring later moves to something less legible — embeddings, a model, cross-user signals — the requirement isn't that it stay simple, it's that it stay able to name the rows that produced each output. An inference that can't do that shouldn't be displayed, because the product's only claim to being different from an ad platform is that its guesses are checkable.
+
+### 10.6 Agreement with disclosed data
+
+`disclosedMatch()` does a loose token comparison between an inferred category and the stored platform tags, and the UI badges the overlaps. The loose match is intentional: it's a display affordance pointing the user at a comparison to make themselves, not a claim of equivalence, so a false positive costs little while a missed overlap hides the interesting case. The genuinely informative result is the *absence* of a match — a platform interest with no support anywhere in the user's own activity.
+
+---
+
+## 11. Export
+
+A single synchronous `buildExport()` assembles disclosed profiles, the full activity log, the inferred profile with evidence, and current session counters into one object. Three serializers render it: JSON (complete, canonical), HTML (the same data formatted for reading), CSV (activity log only, for spreadsheets). They share one builder so the formats cannot drift apart.
+
+Delivery is `Blob` → `URL.createObjectURL` → synthetic anchor click → `revokeObjectURL`. No server is involved at any point, which is a design constraint rather than an implementation detail: an export feature whose purpose is demonstrating local-only data handling must not acquire a network dependency. The HTML serializer escapes all interpolated values via `esc()` — the activity log contains hostnames and page titles that originate from pages the user visited, so it is untrusted input being written into a document the user will open.
+
+The whole file is regenerated on each click rather than cached, so an export always reflects the state at the moment it was requested.
